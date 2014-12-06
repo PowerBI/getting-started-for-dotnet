@@ -7,3 +7,12 @@ C:\Projects\Power BI\Developer\Samples\PBIGettingStarted\PBIGettingStarted\bin\D
 C:\Projects\Power BI\Developer\Samples\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.csprojResolveAssemblyReference.cache
 C:\Projects\Power BI\Developer\Samples\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.exe
 C:\Projects\Power BI\Developer\Samples\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.pdb
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.exe.config
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.exe
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.pdb
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.exe
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.pdb
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.dll
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.xml
+C:\Projects\GitHub\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.csprojResolveAssemblyReference.cache

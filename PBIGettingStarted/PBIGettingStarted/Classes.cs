@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace PBIGettingStarted
 {
+    public class jsonExample
+    {
+        public string Name { get; set; }
+        public DateTime Date { get; set; }
+    }
+
     public class Product
     {
         public int ProductID { get; set; }

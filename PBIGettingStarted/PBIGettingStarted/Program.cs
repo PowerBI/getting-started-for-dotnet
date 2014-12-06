@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 
 using PowerBIExtensionMethods;
+using System.Web.Script.Serialization;
 
 
 namespace PBIGettingStarted
@@ -46,16 +47,16 @@ namespace PBIGettingStarted
 
         static void Main(string[] args)
         {
-            CreateDataset();
+            //CreateDataset();
 
-            ////List<Object> datasets = GetAllDatasets();
+            List<Object> datasets = GetAllDatasets();
 
-            ////foreach (Dictionary<string, object> obj in datasets)
-            ////{
-            ////    Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
-            ////}
+            foreach (Dictionary<string, object> obj in datasets)
+            {
+                Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
+            }
 
-            ////AddRows();
+            //AddRows();
 
             Console.ReadLine();
         }
@@ -86,7 +87,7 @@ namespace PBIGettingStarted
             try
             {
                 //Create a GET web request to list all datasets
-                HttpWebRequest request = DatsetRequest(datasetsUri, "GET", AccessToken);
+                HttpWebRequest request = DatasetRequest(datasetsUri, "GET", AccessToken);
 
                 //Get HttpWebResponse from GET request
                 string responseContent = GetResponse(request);
@@ -106,20 +107,20 @@ namespace PBIGettingStarted
 
         static void CreateDataset()
         {
-            string name = "MusicHabits";
+            string name = "TestDataset";
 
             //In a production application, use more specific exception handling.           
             try
             {               
                 //Create a POST web request to list all datasets
-                HttpWebRequest request = DatsetRequest(datasetsUri, "POST", AccessToken);
+                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
 
                 var datasets = GetAllDatasets().Datasets(name);
 
                 if (datasets.Count() == 0)
                 { 
-                    //POST request using the json schema from a Product
-                    PostRequest(request, new Music().ToJSONSchema(name));
+                    //POST request using the json schema from Music
+                    PostRequest(request, new Music().ToJsonSchema(name));
                 
                     //Get HttpWebResponse from POST request
                     Console.WriteLine(GetResponse(request));
@@ -129,8 +130,6 @@ namespace PBIGettingStarted
                 {
                     Console.WriteLine("Dataset exists");
                 }
-
-
             }
             catch(Exception ex)
             {
@@ -141,16 +140,17 @@ namespace PBIGettingStarted
 
         static void AddRows()
         {
-            string tableName = "MusicHabits";
+            string tableName = "Music";
+            string datasetName = "TestDataset";
 
             //Get dataset id from a table name
-            string datasetId = GetAllDatasets().Datasets(tableName).First()["id"].ToString();
+            string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
 
             //In a production application, use more specific exception handling. 
             try
             {
-                HttpWebRequest request = DatsetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
-
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
+                
                 //Create a list of Music
                 List<Music> musicHabits = new List<Music>
                 {
@@ -160,7 +160,7 @@ namespace PBIGettingStarted
                 };
 
                 //POST request using the json from a list of Music
-                PostRequest(request, musicHabits.ToJSON());
+                PostRequest(request, musicHabits.ToJson(JavaScriptConverter<Music>.GetSerializer()));
 
                 //Get HttpWebResponse from POST request
                 Console.WriteLine(GetResponse(request));
@@ -183,17 +183,15 @@ namespace PBIGettingStarted
             try
             {
                 //Create a DELETE web request
-                HttpWebRequest request = DatsetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "DELETE", AccessToken);
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "DELETE", AccessToken);
                 request.ContentLength = 0;
 
                 Console.WriteLine(GetResponse(request));
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(ex.Message);
             } 
-
         }
 
         private static void PostRequest(HttpWebRequest request, string json)
@@ -224,7 +222,7 @@ namespace PBIGettingStarted
             return response;
         }
 
-        private static HttpWebRequest DatsetRequest(string datasetsUri, string method, string authorizationToken)
+        private static HttpWebRequest DatasetRequest(string datasetsUri, string method, string authorizationToken)
         {
             HttpWebRequest request = System.Net.WebRequest.Create(datasetsUri) as System.Net.HttpWebRequest;
             request.KeepAlive = true;
