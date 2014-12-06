@@ -65,66 +65,64 @@ For more information about how to register an app in Azure Active Directory, see
 2. Create an **HttpWebRequest** using a GET method.  The sample uses DatsetRequest(datasetsUri, "GET", AccessToken) to make a request to the service. See How to make a Power BI request.
 3. Get a response from the Power BI service.
 	
+		private static string datasetsUri = "https://api.powerbi.com/beta/myorg/datasets";
+
+  		static List<Object> GetAllDatasets()
+  		{
+	  		List<Object> datasets = null;
 	
-	private static string datasetsUri = "https://api.powerbi.com/beta/myorg/datasets";
-
-  	static List<Object> GetAllDatasets()
-  	{
-  		List<Object> datasets = null;
-
-      	//Create a GET web request to list all datasets
-  		HttpWebRequest request = DatsetRequest(datasetsUri, "GET", AccessToken);
-
-      	//Get HttpWebResponse from GET request
-      	string responseContent = GetResponse(request);
-
-      	//Get list from response. ToObject() is a sample Power BI extension method
-      	List<Object> datasets = responseContent.ToObject<List<Object>>();
-
-      	return datasets;
-	}
-
+	      	//Create a GET web request to list all datasets
+	  		HttpWebRequest request = DatsetRequest(datasetsUri, "GET", AccessToken);
+	
+	      	//Get HttpWebResponse from GET request
+	      	string responseContent = GetResponse(request);
+	
+	      	//Get list from response. ToObject() is a sample Power BI extension method
+	      	List<Object> datasets = responseContent.ToObject<List<Object>>();
+	
+	      	return datasets;
+		}
 
 ### How to create a dataset ###
 1. Get an access token. See How to get an Azure Active Directory access token.
 2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See How to make a Power BI request. 
 3. Get a response from the Power BI service.
 
-	static void CreateDataset()
-	{
-		string name = "MusicHabits";
-
-		//In a production application, use more specific exception handling.           
-		try
-		{               
-			//Create a POST web request to list all datasets
-			HttpWebRequest request = DatsetRequest(datasetsUri, "POST", AccessToken);
-			
-			//Datasets is a sample Power BI extension method
-			var datasets = GetAllDatasets().Datasets(name);
-
-			if (datasets.Count() == 0)
-			{ 
-				//POST request using the json schema from a Product
-				//ToJsonSchema is a sample Power BI extension method
-				PostRequest(request, new Music().ToJsonSchema(name));
-                
-				//Get HttpWebResponse from POST request
-				Console.WriteLine(GetResponse(request));
-
-			}
-			else
-			{
-				Console.WriteLine("Dataset exists");
-			}
-
-		}
-		catch(Exception ex)
+		static void CreateDataset()
 		{
-
-			Console.WriteLine(ex.Message);
-		} 
-	}
+			string name = "MusicHabits";
+	
+			//In a production application, use more specific exception handling.           
+			try
+			{               
+				//Create a POST web request to list all datasets
+				HttpWebRequest request = DatsetRequest(datasetsUri, "POST", AccessToken);
+				
+				//Datasets is a sample Power BI extension method
+				var datasets = GetAllDatasets().Datasets(name);
+	
+				if (datasets.Count() == 0)
+				{ 
+					//POST request using the json schema from a Product
+					//ToJsonSchema is a sample Power BI extension method
+					PostRequest(request, new Music().ToJsonSchema(name));
+	                
+					//Get HttpWebResponse from POST request
+					Console.WriteLine(GetResponse(request));
+	
+				}
+				else
+				{
+					Console.WriteLine("Dataset exists");
+				}
+	
+			}
+			catch(Exception ex)
+			{
+	
+				Console.WriteLine(ex.Message);
+			} 
+		}
 
 
 ### How to add rows to a dataset ###
