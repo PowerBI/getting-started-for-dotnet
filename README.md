@@ -61,7 +61,6 @@ For more information about how to register an app in Azure Active Directory, see
 
 ### How to get all datasets ###
 
-**To create a dataset**
 1. Get an access token. See How to get an Azure Active Directory access token.
 2. Create an **HttpWebRequest** using a GET method.  The sample uses DatsetRequest(datasetsUri, "GET", AccessToken) to make a request to the service. See How to make a Power BI request.
 3. Get a response from the Power BI service.
