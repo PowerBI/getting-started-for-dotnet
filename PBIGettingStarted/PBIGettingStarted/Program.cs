@@ -45,18 +45,23 @@ namespace PBIGettingStarted
         private static AuthenticationContext authContext = null;
         private static string token = String.Empty;
 
+        private static string tableName = "Product";
+        private static string datasetName = "SalesMarketing";
+
         static void Main(string[] args)
         {
             //CreateDataset();
 
-            List<Object> datasets = GetAllDatasets();
+            //List<Object> datasets = GetAllDatasets();
 
-            foreach (Dictionary<string, object> obj in datasets)
-            {
-                Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
-            }
+            //foreach (Dictionary<string, object> obj in datasets)
+            //{
+            //    Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
+            //}
 
             //AddRows();
+
+            //ClearRows();
 
             Console.ReadLine();
         }
@@ -102,25 +107,22 @@ namespace PBIGettingStarted
             }
 
             return datasets;
-
         }
 
         static void CreateDataset()
         {
-            string name = "TestDataset";
-
             //In a production application, use more specific exception handling.           
             try
             {               
                 //Create a POST web request to list all datasets
                 HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
 
-                var datasets = GetAllDatasets().Datasets(name);
+                var datasets = GetAllDatasets().Datasets(datasetName);
 
                 if (datasets.Count() == 0)
                 { 
-                    //POST request using the json schema from Music
-                    PostRequest(request, new Music().ToJsonSchema(name));
+                    //POST request using the json schema from Product
+                    PostRequest(request, new Product().ToJsonSchema(datasetName));
                 
                     //Get HttpWebResponse from POST request
                     Console.WriteLine(GetResponse(request));
@@ -140,9 +142,6 @@ namespace PBIGettingStarted
 
         static void AddRows()
         {
-            string tableName = "Music";
-            string datasetName = "TestDataset";
-
             //Get dataset id from a table name
             string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
 
@@ -151,16 +150,16 @@ namespace PBIGettingStarted
             {
                 HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
                 
-                //Create a list of Music
-                List<Music> musicHabits = new List<Music>
+                //Create a list of Product
+                List<Product> products = new List<Product>
                 {
-                    new Music{Artist = "Jimi Hendrix", Song = "Purple Haze", Genre = "Rock", Location = "Seattle, WA", EventDate = new DateTime(2014, 7, 30)},
-                    new Music{Artist = "U2", Song = "Beautiful Day", Genre = "Rock", Location = "Portland, OR", EventDate = new DateTime(2014, 8, 25)},
-                    new Music{Artist = "Red Hot Chili Peppers", Song = "Californication", Genre = "Rock", Location = "Portland, OR", EventDate = new DateTime(2014, 9, 25)}
+                    new Product{ProductID = 1, Name="Adjustable Race", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 1, Name="LL Crankarm", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 1, Name="HL Mountain Frame - Silver", Category="Bikes", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
                 };
 
-                //POST request using the json from a list of Music
-                PostRequest(request, musicHabits.ToJson(JavaScriptConverter<Music>.GetSerializer()));
+                //POST request using the json from a list of Product
+                PostRequest(request, products.ToJson(JavaScriptConverter<Product>.GetSerializer()));
 
                 //Get HttpWebResponse from POST request
                 Console.WriteLine(GetResponse(request));
@@ -174,10 +173,8 @@ namespace PBIGettingStarted
 
         static void ClearRows()
         {
-            string tableName = "MusicHabits";
-
             //Get dataset id from a table name
-            string datasetId = GetAllDatasets().Datasets(tableName).First()["id"].ToString();
+            string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
 
             //In a production application, use more specific exception handling. 
             try

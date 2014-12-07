@@ -15,10 +15,8 @@ namespace PBIGettingStarted
     public class Product
     {
         public int ProductID { get; set; }
-        public string Manufacturer { get; set; }
-        public string Category { get; set; }
-        public string Segment { get; set; }
         public string Name { get; set; }
+        public string Category { get; set; }
         public bool IsCompete { get; set; }
         public DateTime ManufacturedOn { get; set; }
     }
