@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +24,48 @@ namespace PowerBIExtensionMethods
             jsonBuilder.Append(serializer.Serialize(obj));
             jsonBuilder.Append(string.Format("{0}", "}"));
 
-           return jsonBuilder.ToString();
+            return jsonBuilder.ToString();
+        }
+
+        public static string ToJson(this IDataReader reader)
+        {
+            StringBuilder jsonBuilder = new StringBuilder();
+
+            jsonBuilder.Append(string.Format("{0}\"rows\":", "{"));
+            jsonBuilder.Append(JsonFromDataReader(reader));
+
+            jsonBuilder.Append(string.Format("{0}", "}"));
+
+            return jsonBuilder.ToString();
+        }
+
+        public static String JsonFromDataReader(IDataReader reader)
+        {
+            var columnNames = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName).ToList();
+
+            int length = columnNames.Count;
+
+            String res = "[";
+
+            while (reader.Read())
+            {
+                res += "{";
+
+                for (int i = 0; i < length; i++)
+                {
+                    res += "\"" + columnNames[i] + "\":\"" + reader[columnNames[i]].ToString() + "\"";                   
+                    if (i < length - 1)
+                        res += ",";
+                }
+
+                res += "},";
+            }
+
+            res = res.Remove(res.Length - 1, 1);
+
+            res += "]";
+
+            return res;
         }
 
         public static string ToJsonSchema(this object obj, string name)
@@ -72,6 +115,28 @@ namespace PowerBIExtensionMethods
             return jsonSchemaBuilder.ToString();
         }
 
+        public static string ToJsonSchema(this SqlConnection sqlConnection, string name, string viewName)
+        {
+            StringBuilder jsonSchemaBuilder = new StringBuilder();
+
+            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", name));
+            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", viewName));
+            jsonSchemaBuilder.Append("\"columns\": [");
+
+            string json = String.Concat(from r in sqlConnection.GetSchema("Columns").AsEnumerable()
+                           where r.Field<string>("TABLE_NAME") == viewName
+                          orderby r.Field<int>("ORDINAL_POSITION")
+                                  select 
+                                  string.Format("{0} \"name\":\"{1}\", \"dataType\": \"{2}\"{3}, ", "{", r.Field<string>("COLUMN_NAME"), ConvertSqlType(r.Field<string>("DATA_TYPE")), "}")
+                           );
+
+            jsonSchemaBuilder.Append(json);
+            jsonSchemaBuilder.Remove(jsonSchemaBuilder.ToString().Length - 2, 2);
+            jsonSchemaBuilder.Append("]}]}");
+
+            return jsonSchemaBuilder.ToString();
+        }
+
         public static T ToObject<T>(this string obj, int recursionDepth = 100)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -90,6 +155,45 @@ namespace PowerBIExtensionMethods
 
             return q;
         }
+
+        private static string ConvertSqlType(string sqlType)
+        {
+            string jsonType = string.Empty;
+
+            switch (sqlType)
+            {
+                case "int":
+                case "smallint":
+                case "bigint":
+                    jsonType = "Int64";
+                    break;
+                case "decimal":
+                case "money":
+                    jsonType = "Double";
+                    break;
+                case "bit":
+                    jsonType = "bool";
+                    break;
+                case "datetime":
+                    jsonType = "DateTime";
+                    break;
+                case "nvarchar":
+                    jsonType = "string";
+                    break;
+                default:
+                    jsonType = null;
+                    break;
+            }
+
+            return jsonType;
+
+        }
+    }
+
+    public class JsonColumn
+    {
+        public string Name { get; set; }
+        public string DataType { get; set; }
     }
 
     public class JavaScriptConverter<T> : JavaScriptConverter where T : new()
@@ -163,5 +267,3 @@ namespace PowerBIExtensionMethods
         }
     }
 }
-
-

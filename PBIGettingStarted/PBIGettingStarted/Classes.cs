@@ -21,6 +21,7 @@ namespace PBIGettingStarted
         public DateTime ManufacturedOn { get; set; }
     }
 
+
     public class Music
     {
         public string Artist { get; set; }
