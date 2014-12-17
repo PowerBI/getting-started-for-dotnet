@@ -29,13 +29,12 @@ namespace PBIGettingStarted
 
     class Program
     {
-        
+
         //Step 1 - Replace client app ID 
-        private static string clientID = "07054a93-dc5b-42c9-b2c9-fc26364150e5";        
+        private static string clientID = "{ClientID}";
         
         //Step 2 - Replace redirectUri
         private static string redirectUri = "https://powerbi.com";
-
         
         //Power BI resource uri
         private static string resourceUri = "https://analysis.windows.net/powerbi/api";             
@@ -49,12 +48,12 @@ namespace PBIGettingStarted
 
 
         //.NET Class Example:
-        //private static string datasetName = "SalesMarketing";
-        //private static string tableName = "Product";
+        private static string datasetName = "SalesMarketing";
+        private static string tableName = "Product";
 
         //SQL Server Examples
-        private static string datasetName = "SQL_ProductList";
-        private static string tableName = "jsonProduct";
+        //private static string datasetName = "SQL_ProductList";
+        //private static string tableName = "jsonProduct";
 
         //private static string datasetName = "SQL_vCompanySales";
         //private static string tableName = "vCompanySales";
