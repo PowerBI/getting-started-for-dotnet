@@ -1,30 +1,26 @@
 Getting Started with the Power BI REST API
 =
+The getting started sample shows you how to
+
+- Register a Native Client Application
+- Get an Azure Active Directory access token
+- Get all datasets
+- Create a dataset
+- Add rows to a dataset
+
 Before you run the sample code, register a client app in your Azure Active Directory.
 
 ## Register a Native Client Application ##
-When you register a native client application, such as a console app, you receive a Client ID.  The Client ID is used by the application to identify themselves to the users that they are requesting permissions from. For a .NET application, you use the Client ID to get an authentication token. For more information about Power BI Authentication, see {TODO: link}
+When you register a native client application, such as a console app, you receive a Client ID.  The Client ID is used by the application to identify themselves to the users that they are requesting permissions from. For a .NET application, you use the Client ID to get an authentication token. For more information about Power BI Authentication, see [Authenticate with Power BI](http://go.microsoft.com/fwlink/?LinkId=519359).
 
 ### Register a client app ###
-1. Sign into your Microsoft Azure subscription.
-2. In the left service panel, choose **ACTIVE DIRECTORY**.
-3. Click any active directory.
-4. Click **APPLICATIONS**.
-5. Click **ADD**.
-6. In the **Tell us about your application** page, enter a **NAME** such as "My Power BI app", and choose **NATIVE CLIENT APPLICATION** for the type, and click **Next** icon.
-7. In the **Application information** page, enter a **REDIRECT URI** such as "https://powerbi.com". The URI to which Windows Azure AD will redirect in response to an OAuth 2.0 request. The value does not need to be a physical endpoint, but must be a valid URI. For client apps, you can use the generic URL of https://login.live.com/oauth20_desktop.srf.
-8. Click the **Complete** icon.
-9. In the application page, choose **CONFIGURE**. You will see your client id.
-10. Add permissions to Power BI at the bottom of the page. For more information about Power BI permissions, see {Power BI Permissions}
-
-TODO: {Can't see Power BI Service listed, How to get a Power BI subscription }
-
-For more information about how to register an app in Azure Active Directory, see http://go.microsoft.com/fwlink/?LinkId=519361.
+To register an app in Azure Active Directory, see [Register an app](http://int.msdn.microsoft.com/en-US/library/dn877542.aspx).
 
 ### How to get a client app id ###
 1. In the Microsoft Azure portal, choose an **ACTIVE DIRECTORY** application.
-2. In the application page, choose **CONFIGURE**. After you register a new app, the application page is displayed.
-3. In the **CONFIGURE** page, copy the **CLIENT ID**. On the **CONFIGURE** page, you can also get the **REDIRECT URI**.
+2. In the application page, choose **APPLICATIONS**.
+3. Choose your application.
+4. In the **CONFIGURE** page, copy the **CLIENT ID**. On the **CONFIGURE** page, you can also get the **REDIRECT URI**.
 
 ### To run the sample ###
 
@@ -38,7 +34,7 @@ For more information about how to register an app in Azure Active Directory, see
 
 ### How to get an Azure Active Directory access token ###
 
-1. Add the “Active Directory Authentication Library” NuGet package to your project. To learn how to add Active Directory Authentication Library, see Authenticate with Power BI.
+1. Add the "Active Directory Authentication Library" NuGet package to your project. To learn how to add Active Directory Authentication Library, see Authenticate with Power BI.
 2. Add a reference to Microsoft.IdentityModel.Clients.ActiveDirectory.
 3. Create a new **AuthenticationContext** passing an Authority. An authority  knows about the service you want to invoke, and knows how to authenticate you.
 4. Get an **Azure Active Directory** token by calling **AcquireToken**.
@@ -65,6 +61,7 @@ For more information about how to register an app in Azure Active Directory, see
 2. Create an **HttpWebRequest** using a GET method.  The sample uses DatsetRequest(datasetsUri, "GET", AccessToken) to make a request to the service. See How to make a Power BI request.
 3. Get a response from the Power BI service.
 	
+	
 		private static string datasetsUri = "https://api.powerbi.com/beta/myorg/datasets";
 
   		static List<Object> GetAllDatasets()
@@ -83,6 +80,7 @@ For more information about how to register an app in Azure Active Directory, see
 	      	return datasets;
 		}
 
+
 ### How to create a dataset ###
 1. Get an access token. See How to get an Azure Active Directory access token.
 2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See How to make a Power BI request. 
@@ -90,7 +88,7 @@ For more information about how to register an app in Azure Active Directory, see
 
 		static void CreateDataset()
 		{
-			string name = "MusicHabits";
+			string name = "SalesMarketing";
 	
 			//In a production application, use more specific exception handling.           
 			try
@@ -105,7 +103,7 @@ For more information about how to register an app in Azure Active Directory, see
 				{ 
 					//POST request using the json schema from a Product
 					//ToJsonSchema is a sample Power BI extension method
-					PostRequest(request, new Music().ToJsonSchema(name));
+					PostRequest(request, new Product().ToJsonSchema(name));
 	                
 					//Get HttpWebResponse from POST request
 					Console.WriteLine(GetResponse(request));
@@ -133,7 +131,7 @@ For more information about how to register an app in Azure Active Directory, see
 
 		static void AddRows()
     	{
-    		string tableName = "MusicHabits";
+    		string tableName = "SalesMarketing";
 
         	//Get dataset id from a table name.
 			//Datasets is a sample Power BI extension method
@@ -144,13 +142,13 @@ For more information about how to register an app in Azure Active Directory, see
         	{
             	HttpWebRequest request = DatsetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
 
-            	//Create a list of Music
-           		List<Music> musicHabits = new List<Music>
-            	{
-                	new Music{Artist = "Jimi Hendrix", Song = "Purple Haze", Genre = "Rock", Location = "Seattle, WA", EventDate = new DateTime(2014, 7, 30)},
-                	new Music{Artist = "U2", Song = "Beautiful Day", Genre = "Rock", Location = "Portland, OR", EventDate = new DateTime(2014, 8, 25)},
-                	new Music{Artist = "Red Hot Chili Peppers", Song = "Californication", Genre = "Rock", Location = "Portland, OR", EventDate = new DateTime(2014, 9, 25)}
-            	};
+                //Create a list of Product
+                List<Product> products = new List<Product>
+                {
+                    new Product{ProductID = 1, Name="Adjustable Race", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 1, Name="LL Crankarm", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 1, Name="HL Mountain Frame - Silver", Category="Bikes", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                };
 
             	//POST request using the json from a list of Music
             	PostRequest(request, musicHabits.ToJson(JavaScriptConverter<Music>.GetSerializer()));
@@ -223,9 +221,11 @@ To POST JSON to the service from an **HttpWebRequest** request and json string, 
 
 
 ###  Power BI sample extension methods ###
-Power BI uses JSON to transmit data objects between a client and the Power BI service. JSON is a text string that represents a collection of objects. The Power BI Getting Started Sample uses several extension methods that make using JSON with Power BI API really easy. To learn more about the Power BI sample extension methods, see JSONBuilder.cs in the sample source code. For more information about Power BI JSON, see {TODO}.
+Power BI uses JSON to transmit data objects between a client and the Power BI service. JSON is a text string that represents a collection of objects. The Power BI Getting Started Sample uses several extension methods that make using JSON with Power BI API really easy. To learn more about the Power BI sample extension methods, see JSONBuilder.cs in the sample source code. For more information about Power BI JSON, see [Introduction to Power BI Data Push (Preview)][2].
 
-**object.ToJsonSchema()** - Returns Power BI JSON schema from a .NET class
+**ToJsonSchema**
+    
+    object.ToJsonSchema() - Returns Power BI JSON schema from a .NET class
 
 	public class jsonExample
     {
@@ -235,14 +235,14 @@ Power BI uses JSON to transmit data objects between a client and the Power BI se
 
 	string json = new jsonExample().ToJsonSchema("JSON Example");
 
-**json**
-
 	{"name": "JSON Example","tables": 
 		[{"name": "jsonExample", "columns": 
 			[{ "name": "Name", "dataType": "string"},{ "name": "Date", "dataType": "DateTime"}]}]}
 
 
-**object.ToJson()** - Returns Power BI JSON rows from a List\<T\>
+**ToJson**
+
+    object.ToJson() - Returns Power BI JSON rows from a List<T>
 
     List<jsonExample> jsonExamples = new List<jsonExample>
     {
@@ -253,22 +253,23 @@ Power BI uses JSON to transmit data objects between a client and the Power BI se
 
     string json = jsonExamples.ToJson(JavaScriptConverter<jsonExample>.GetSerializer());
 
-**json**
-
 	"{"rows":[
 		{"Name":"Name1","Date":"12/04/2014"},
 		{"Name":"Name2","Date":"12/04/2014"},
 		{"Name":"Name3","Date":"09/14/2015"}]}"
 
-**string.ToObject()** - Gets a List<Object> from a JSON string
+
+**ToObject**
+
+    string.ToObject() - Gets a List<Object> from a JSON string
 
 	List<Object> datasets = responseJson.ToObject<List<Object>>();
 
+**Datasets - IEnumerable&lt;Dictionary&lt;string, object&gt;&gt;** 
 
-<p>paragraph <b>emphasis</b>
-
-**List\<Object\>datasets(name)** - Gets an IEnumerable\<Dictionary\<string, object\>\> from a dataset name</div>
+    List<Object>datasets(name) - Gets an IEnumerable<Dictionary<string, object>> from a dataset name
 	
 	string datasetId = GetAllDatasets().Datasets(tableName).First()["id"].ToString();
 
 For more information about JSON, see [Introducing JSON](http://json.org/). 
+

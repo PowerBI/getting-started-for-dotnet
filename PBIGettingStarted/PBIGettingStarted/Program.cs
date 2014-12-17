@@ -31,7 +31,7 @@ namespace PBIGettingStarted
     {
 
         //Step 1 - Replace client app ID 
-        private static string clientID = "{ClientID}";
+        private static string clientID = "1ed671c7-3136-4cdd-957c-31d5f4ce97d4";
         
         //Step 2 - Replace redirectUri
         private static string redirectUri = "https://powerbi.com";
