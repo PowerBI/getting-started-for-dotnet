@@ -63,6 +63,9 @@ namespace PBIGettingStarted
 
         static void Main(string[] args)
         {
+            // Test the connection and update the datasetsUri in case of redirect
+            datasetsUri = TestConnection();
+
             CreateDataset();
             //CreateFromSqlSchema();
 
@@ -73,6 +76,7 @@ namespace PBIGettingStarted
                 Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
             }
 
+            Console.WriteLine("Press and key to push rows:");
             Console.ReadLine();
             AddClassRows();
 
@@ -123,6 +127,26 @@ namespace PBIGettingStarted
                     Console.WriteLine(ex.Message);
                 } 
             }
+        }
+
+        private static string TestConnection()
+        {
+            // Check the connection for redirects
+            HttpWebRequest request = System.Net.WebRequest.Create(datasetsUri) as System.Net.HttpWebRequest;
+            request.KeepAlive = true;
+            request.Method = "GET";
+            request.ContentLength = 0;
+            request.ContentType = "application/json";
+            request.Headers.Add("Authorization", String.Format("Bearer {0}", AccessToken));
+            request.AllowAutoRedirect = false;
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            if (response.StatusCode == HttpStatusCode.TemporaryRedirect)
+            {
+                return response.Headers["Location"];
+            }
+            return datasetsUri;
+
         }
 
         static void AddSQLRows()
