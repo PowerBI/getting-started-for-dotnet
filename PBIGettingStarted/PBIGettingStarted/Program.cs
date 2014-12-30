@@ -32,9 +32,9 @@ namespace PBIGettingStarted
 
         //Step 1 - Replace client app ID 
         private static string clientID = "{ClientID}";
-        
-        //Step 2 - Replace redirectUri
-        private static string redirectUri = "https://powerbi.com";
+
+        //Step 2 - Replace redirectUri with the uri you used when you registered your app
+        private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
         
         //Power BI resource uri
         private static string resourceUri = "https://analysis.windows.net/powerbi/api";             
@@ -76,15 +76,21 @@ namespace PBIGettingStarted
                 Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
             }
 
-            Console.WriteLine("Press and key to push rows:");
+            // initiate pushing of rows to Power BI
+            Console.WriteLine("Press the Enter key to push rows into Power BI:");
             Console.ReadLine();
             AddClassRows();
 
+            //Optional to test clear rows from a table
             //ClearRows();
-          
+
+            //optional if using SQL Azure
             //AddSQLRows();
 
+            // Finished pushing rows to Power BI, close the console window
+            Console.WriteLine("Data pushed to Power BI. Press the Enter key to close this window:");
             Console.ReadLine();
+
         }
 
         /// <summary>
@@ -112,10 +118,8 @@ namespace PBIGettingStarted
                     if (datasets.Count() == 0)
                     {
                         //POST request using the json schema from Product
-                        PostRequest(request, conn.ToJsonSchema(datasetName, tableName));
+                        Console.WriteLine(PostRequest(request, conn.ToJsonSchema(datasetName, tableName)));
 
-                        //Get HttpWebResponse from POST request
-                        Console.WriteLine(GetResponse(request));
                     }
                     else
                     {
@@ -182,10 +186,9 @@ namespace PBIGettingStarted
                     {
                         HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
                         //POST request using the json from a list of Product
-                        PostRequest(request, json);
+                        Console.WriteLine(PostRequest(request, json));
 
-                        //Get HttpWebResponse from POST request
-                        Console.WriteLine(GetResponse(request));
+                        
                     }
                     catch (Exception ex)
                     {
@@ -251,10 +254,7 @@ namespace PBIGettingStarted
                 if (datasets.Count() == 0)
                 { 
                     //POST request using the json schema from Product
-                    PostRequest(request, new Product().ToJsonSchema(datasetName));
-                
-                    //Get HttpWebResponse from POST request
-                    Console.WriteLine(GetResponse(request));
+                    Console.WriteLine(PostRequest(request, new Product().ToJsonSchema(datasetName)));
                 }
                 else
                 {
@@ -287,10 +287,8 @@ namespace PBIGettingStarted
                 };
 
                 //POST request using the json from a list of Product
-                PostRequest(request, products.ToJson(JavaScriptConverter<Product>.GetSerializer()));
+                Console.WriteLine(PostRequest(request, products.ToJson(JavaScriptConverter<Product>.GetSerializer())));
 
-                //Get HttpWebResponse from POST request
-                Console.WriteLine(GetResponse(request));
             }
             catch (Exception ex)
             {
@@ -319,7 +317,7 @@ namespace PBIGettingStarted
             } 
         }
 
-        private static void PostRequest(HttpWebRequest request, string json)
+        private static string PostRequest(HttpWebRequest request, string json)
         {
             byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
             request.ContentLength = byteArray.Length;
@@ -329,6 +327,7 @@ namespace PBIGettingStarted
             {
                 writer.Write(byteArray, 0, byteArray.Length);
             }
+            return GetResponse(request);
         }
 
         private static string GetResponse(HttpWebRequest request)
