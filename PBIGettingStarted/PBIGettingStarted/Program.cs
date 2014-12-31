@@ -204,14 +204,16 @@ namespace PBIGettingStarted
             {               
                 if (token == String.Empty)
                 {
-                    authContext = new AuthenticationContext(authority);
+                    TokenCache TC = new TokenCache();
+                    authContext = new AuthenticationContext(authority,TC);
                     token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
                     
                     return token;
                 }
                 else
                 {
-                    return token;
+
+                    return authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
                 }
             }
         }
