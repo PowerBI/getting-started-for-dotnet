@@ -80,8 +80,11 @@ namespace PowerBIExtensionMethods
             PropertyInfo[] properties = obj.GetType().GetProperties();
 
             foreach(PropertyInfo p in properties)
-            {  
-                switch (p.PropertyType.Name)
+            {
+                string sPropertyTypeName = p.PropertyType.Name;
+                if (sPropertyTypeName.StartsWith("Nullable") && p.PropertyType.GenericTypeArguments != null && p.PropertyType.GenericTypeArguments.Length == 1)
+                    sPropertyTypeName = p.PropertyType.GenericTypeArguments[0].Name;
+                switch (sPropertyTypeName)
                 {                   
                     case "Int32": case "Int64":
                         typeName = "Int64";

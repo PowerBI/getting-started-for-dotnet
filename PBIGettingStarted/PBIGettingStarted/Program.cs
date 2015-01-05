@@ -76,7 +76,7 @@ namespace PBIGettingStarted
                 Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
             }
 
-            // initiate pushing of rows to Power BI
+            //Initiate pushing of rows to Power BI
             Console.WriteLine("Press the Enter key to push rows into Power BI:");
             Console.ReadLine();
             AddClassRows();
@@ -84,7 +84,7 @@ namespace PBIGettingStarted
             //Optional to test clear rows from a table
             //ClearRows();
 
-            //optional if using SQL Azure
+            //Optional if using SQL Azure
             //AddSQLRows();
 
             // Finished pushing rows to Power BI, close the console window
@@ -201,20 +201,21 @@ namespace PBIGettingStarted
         static string AccessToken
         {
             get
-            {               
+            {
+                string accessToken = string.Empty;
+
                 if (token == String.Empty)
                 {
                     TokenCache TC = new TokenCache();
                     authContext = new AuthenticationContext(authority,TC);
-                    token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
-                    
-                    return token;
+                    accessToken = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
                 }
                 else
                 {
-
-                    return authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
+                    accessToken =  authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
                 }
+
+                return accessToken;
             }
         }
 
@@ -289,6 +290,8 @@ namespace PBIGettingStarted
                 };
 
                 //POST request using the json from a list of Product
+                //NOTE: Posting rows to a model that is not created through the Power BI API is not currently supported. 
+                //      Please create a dataset by posting it through the API following the instructions on http://dev.powerbi.com.
                 Console.WriteLine(PostRequest(request, products.ToJson(JavaScriptConverter<Product>.GetSerializer())));
 
             }
