@@ -202,20 +202,20 @@ namespace PBIGettingStarted
         {
             get
             {
-                string accessToken = string.Empty;
+                
 
                 if (token == String.Empty)
                 {
                     TokenCache TC = new TokenCache();
                     authContext = new AuthenticationContext(authority,TC);
-                    accessToken = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
+                    token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
                 }
                 else
                 {
-                    accessToken =  authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
+                    token = authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
                 }
 
-                return accessToken;
+                return token;
             }
         }
 
