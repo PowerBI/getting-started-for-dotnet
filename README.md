@@ -1,5 +1,10 @@
 Getting Started with the Power BI REST API
 =
+
+
+[](https://msdn.microsoft.com/en-US/library/dn877542.aspx)
+
+
 The getting started sample shows you how to
 
 - Register a Native Client Application
@@ -9,6 +14,11 @@ The getting started sample shows you how to
 - Add rows to a dataset
 
 Before you run the sample code, register a client app in your Azure Active Directory.
+
+*NOTE*  Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
+
+To learn how to register your client app in the Azure AD, see [Register an app](https://msdn.microsoft.com/en-US/library/dn877542.aspx)
+
 
 ## Register a Native Client Application ##
 When you register a native client application, such as a console app, you receive a Client ID.  The Client ID is used by the application to identify themselves to the users that they are requesting permissions from. For a .NET application, you use the Client ID to get an authentication token. For more information about Power BI Authentication, see [Authenticate with Power BI](http://go.microsoft.com/fwlink/?LinkId=519359).
