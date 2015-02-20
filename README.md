@@ -15,7 +15,7 @@ The getting started sample shows you how to
 
 Before you run the sample code, register a client app in your Azure Active Directory.
 
-*NOTE*  Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
+**NOTE**  Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
 
 To learn how to register your client app in the Azure AD, see [Register an app](https://msdn.microsoft.com/en-US/library/dn877542.aspx)
 
