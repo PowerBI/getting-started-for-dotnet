@@ -15,9 +15,10 @@ Before you run the sample code, register a client app in your Azure Active Direc
 When you register a native client application, such as a console app, you receive a Client ID.  The Client ID is used by the application to identify themselves to the users that they are requesting permissions from. For a .NET application, you use the Client ID to get an authentication token. For more information about Power BI Authentication, see [Authenticate with Power BI](http://go.microsoft.com/fwlink/?LinkId=519359).
 
 ### Register a client app ###
-To register an app in Azure Active Directory, see [Register an app](http://msdn.microsoft.com/en-US/library/dn877542.aspx).
 
-**NOTE**  Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
+Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
+
+To register an app in Azure Active Directory, see [Register an app](http://msdn.microsoft.com/en-US/library/dn877542.aspx).
 
 ### How to get a client app id ###
 1. In the Microsoft Azure portal, choose an **ACTIVE DIRECTORY** application.
