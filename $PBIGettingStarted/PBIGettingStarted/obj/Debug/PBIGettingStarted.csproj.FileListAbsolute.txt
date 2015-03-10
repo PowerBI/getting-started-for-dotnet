@@ -1,9 +1,0 @@
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.exe.config
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.exe
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\PBIGettingStarted.pdb
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.dll
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\bin\Debug\Microsoft.IdentityModel.Clients.ActiveDirectory.xml
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.csprojResolveAssemblyReference.cache
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.exe
-C:\Users\derrickv\Source\Repos\getting-started-for-dotnet\PBIGettingStarted\PBIGettingStarted\obj\Debug\PBIGettingStarted.pdb

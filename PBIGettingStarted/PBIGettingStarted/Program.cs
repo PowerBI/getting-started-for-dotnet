@@ -25,13 +25,12 @@ namespace PBIGettingStarted
     //See How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
 
     //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
-    //Step 2 - Replace redirectUri with your redirect uri.
 
     class Program
     {
-
         //Step 1 - Replace client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
         private static string clientID = "";
+
 
         //Replace redirectUri with the uri you used when you registered your app
         private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
