@@ -24,11 +24,9 @@ namespace PBIGettingStarted
 
     //See How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
 
-    //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
-
     class Program
     {
-        //Step 1 - Replace client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
+        //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
         private static string clientID = "";
 
 
