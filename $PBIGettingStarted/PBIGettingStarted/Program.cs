@@ -30,10 +30,10 @@ namespace PBIGettingStarted
     class Program
     {
 
-        //Step 1 - Replace client app ID 
-        private static string clientID = "{ClientID}";
+        //Step 1 - Replace client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
+        private static string clientID = "";
 
-        //Step 2 - Replace redirectUri with the uri you used when you registered your app
+        //Replace redirectUri with the uri you used when you registered your app
         private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
         
         //Power BI resource uri
