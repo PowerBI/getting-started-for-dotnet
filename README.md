@@ -1,56 +1,53 @@
 Getting Started with the Power BI REST API
 =
 
-The getting started sample shows you how to
+The Power BI getting started sample shows you how to
 
-- Register a Native Client Application
-- Get an Azure Active Directory access token
-- Get all datasets
-- Create a dataset
-- Add rows to a dataset
+- [Register a Native Client Application](#registerClientApp)
+- [Get an Azure Active Directory access token](#AAD)
+- [Get all datasets](#get)
+- [Create a dataset](#create)
+- [Add rows to a dataset](#add)
+- [How to add Active Directory Authentication Library](#addlib)
 
-Before you run the sample code, register a client app in your Azure Active Directory.
+If this is your first time creating a Power BI app, see [Power BI Quick Start](Power+BI+app+quick+start.md).
 
+Before you run the sample code, register the sample client app in your Azure Active Directory. Power BI apps are integrated with Azure Active Directory (AD) to provide secure sign in and authorization for your app. To integrate a Power BI app with Azure AD, you register the details about your application with Azure AD by using the Azure Management Portal.
+
+To register an app in Azure Active Directory, see [Register an app](Register+an+app.md).
+<a name="registerClientApp"></a>
 ## Register a Native Client Application ##
 When you register a native client application, such as a console app, you receive a Client ID.  The Client ID is used by the application to identify themselves to the users that they are requesting permissions from. For a .NET application, you use the Client ID to get an authentication token. For more information about Power BI Authentication, see [Authenticate with Power BI](http://go.microsoft.com/fwlink/?LinkId=519359).
 
-### Register a client app ###
-
-Your app needs to delegate permission to Power BI so that Power BI has read access to user profiles. If you have an Office365 active directory account, you need to merge your Office365 active directory accounts, with an active Power BI license, into your Azure AD.
-
-To register an app in Azure Active Directory, see [Register an app](http://msdn.microsoft.com/en-US/library/dn877542.aspx).
-
+To register an app in Azure Active Directory, see [Register an app](Register+an+app.md).
+<a name="getClientID"></a>
 ### How to get a client app id ###
-1. In the Microsoft Azure portal, choose an **ACTIVE DIRECTORY** application.
-2. In the application page, choose **APPLICATIONS**.
+1. In the **Microsoft Azure portal**, choose **ACTIVE DIRECTORY** in the left pane or **Directory** in the **All Items** list. If you do not have an organizational Azure Active Directory, see [Setup Azure Active Directory](Setup+Azure+Active+Directory.md). 
+2. In the **Azure Active Directory** page, choose **APPLICATIONS**.
 3. Choose your application.
-4. In the **CONFIGURE** page, copy the **CLIENT ID**. On the **CONFIGURE** page, you can also get the **REDIRECT URI**.
+4. In the **CONFIGURE** page, copy the **CLIENT ID**.
 
 ### To run the sample ###
 
-1. Replace **clientID** with your client app ID.
+1. Replace **clientID** with your client app ID. To learn how to get a client app ID, see [How to get a client app id](#getClientID).
 
-		private static string clientID = "{ClientID}"; 
-
-2. Replace **redirectUri** with the redirect uri used when you registered your app.
-
-    	private static string redirectUri = "https://powerbi.com";
-
+		private static string clientID = ""; 
+<a name="AAD"></a>
 ### How to get an Azure Active Directory access token ###
 
-1. Add the "Active Directory Authentication Library" NuGet package to your project. To learn how to add Active Directory Authentication Library, see Authenticate with Power BI.
+1. Add the "Active Directory Authentication Library" NuGet package to your project. To learn how to add Active Directory Authentication Library, see [How to add Active Directory Authentication Library](#addlib).
 2. Add a reference to Microsoft.IdentityModel.Clients.ActiveDirectory.
-3. Create a new **AuthenticationContext** passing an Authority. An authority  knows about the service you want to invoke, and knows how to authenticate you.
+3. Create a new **AuthenticationContext** passing an Authority. An authority knows about the service you want to invoke, and knows how to authenticate you.
 4. Get an **Azure Active Directory** token by calling **AcquireToken**.
 
+		//Client app ID. To learn how to get a client app ID, see [How to register an app](Register+an+app.md).
+		private static string clientID = ""; 
+		
+		//Power BI resource uri
+		private static string resourceUri = "https://analysis.windows.net/powerbi/api"; 		
+		
 		//OAuth2 authority
 		private static string authority = "https://login.windows.net/common/oauth2/authorize";
-
-		//Power BI resource uri
-		private static string resourceUri = "https://analysis.windows.net/powerbi/api"; 
-		
-		//Client app ID 
-		private static string clientID = "{Client ID}"; 
 		
 		//Create a new AuthenticationContext passing an Authority.
 		AuthenticationContext authContext = new AuthenticationContext(authority);
@@ -58,11 +55,11 @@ To register an app in Azure Active Directory, see [Register an app](http://msdn.
 		//Get an Azure Active Directory token by calling AcquireToken
     	string token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
 
-
+<a name="get"></a>
 ### How to get all datasets ###
 
-1. Get an access token. See How to get an Azure Active Directory access token.
-2. Create an **HttpWebRequest** using a GET method.  The sample uses DatsetRequest(datasetsUri, "GET", AccessToken) to make a request to the service. See How to make a Power BI request.
+1. Get an access token. See [How to get an Azure Active Directory access token](#AAD).
+2. Create an **HttpWebRequest** using a GET method.  The sample uses DatsetRequest(datasetsUri, "GET", AccessToken) to make a request to the service. See [How to make a Power BI request](#request).
 3. Get a response from the Power BI service.
 	
 	
@@ -85,9 +82,10 @@ To register an app in Azure Active Directory, see [Register an app](http://msdn.
 		}
 
 
+<a name="create"></a>
 ### How to create a dataset ###
-1. Get an access token. See How to get an Azure Active Directory access token.
-2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See How to make a Power BI request. 
+1. Get an access token. See [How to get an Azure Active Directory access token](#AAD).
+2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See [How to make a Power BI request](#request). 
 3. Get a response from the Power BI service.
 
 		static void CreateDataset()
@@ -127,9 +125,10 @@ To register an app in Azure Active Directory, see [Register an app](http://msdn.
 		}
 
 
+<a name="add"></a>
 ### How to add rows to a dataset ###
-1. Get an access token. See How to get an Azure Active Directory access token.
-2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See How to make a Power BI request. 
+1. Get an access token. See How to get an [How to get an Azure Active Directory access token](#AAD).
+2. Create an **HttpWebRequest** using a POST method. The sample uses DatsetRequest(datasetsUri, "POST", AccessToken) to make a request to the service. See [How to make a Power BI request](#request). 
 3. To identify the dataset to add rows to, the resource uri for a POST method has a dataset id.
 3. Get a response from the Power BI service.
 
@@ -166,7 +165,7 @@ To register an app in Azure Active Directory, see [Register an app](http://msdn.
         	} 
     	}
 
-
+<a name="request"></a>
 ### How to make a Power BI request ###
 To make a GET or POST request on the Power BI service:
 - Create an **HttpWebRequest** from a dataset resource url. 
@@ -225,12 +224,10 @@ To POST JSON to the service from an **HttpWebRequest** request and json string, 
 
 
 ###  Power BI sample extension methods ###
-Power BI uses JSON to transmit data objects between a client and the Power BI service. JSON is a text string that represents a collection of objects. The Power BI Getting Started Sample uses several extension methods that make using JSON with Power BI API really easy. To learn more about the Power BI sample extension methods, see JSONBuilder.cs in the sample source code. For more information about Power BI JSON, see [Introduction to Power BI Data Push (Preview)][2].
+Power BI uses JSON to transmit data objects between a client and the Power BI service. JSON is a text string that represents a collection of objects. The Power BI Getting Started Sample uses several extension methods that make using JSON with Power BI API really easy. To learn more about the Power BI sample extension methods, see JSONBuilder.cs in the sample source code. For more information about Power BI JSON, see [Introduction to Power BI Data Push (Preview](Introduction+to+Power+BI+REST+API+(Preview).md).
 
-**ToJsonSchema**
+object.ToJsonSchema(string) - Returns Power BI JSON schema from a .NET class.
     
-    object.ToJsonSchema() - Returns Power BI JSON schema from a .NET class
-
 	public class jsonExample
     {
         public string Name { get; set; }
@@ -244,9 +241,7 @@ Power BI uses JSON to transmit data objects between a client and the Power BI se
 			[{ "name": "Name", "dataType": "string"},{ "name": "Date", "dataType": "DateTime"}]}]}
 
 
-**ToJson**
-
-    object.ToJson() - Returns Power BI JSON rows from a List<T>
+List&lt;T&gt;.ToJson(JavaScriptSerializer&lt;T&gt;) - Returns Power BI JSON rows from a List&lt;T&gt;.
 
     List<jsonExample> jsonExamples = new List<jsonExample>
     {
@@ -263,17 +258,20 @@ Power BI uses JSON to transmit data objects between a client and the Power BI se
 		{"Name":"Name3","Date":"09/14/2015"}]}"
 
 
-**ToObject**
-
-    string.ToObject() - Gets a List<Object> from a JSON string
+string.ToObject&lt;List&lt;Object&gt;&gt;() - Gets a List&lt;Object&gt; from a JSON string
 
 	List<Object> datasets = responseJson.ToObject<List<Object>>();
 
-**Datasets - IEnumerable&lt;Dictionary&lt;string, object&gt;&gt;** 
+Datasets(string) - Gets an IEnumerable&lt;Dictionary&lt;string, object&gt;&gt; from a dataset name.
 
-    List<Object>datasets(name) - Gets an IEnumerable<Dictionary<string, object>> from a dataset name
-	
 	string datasetId = GetAllDatasets().Datasets(tableName).First()["id"].ToString();
 
 For more information about JSON, see [Introducing JSON](http://json.org/). 
+<a name="addlib"></a>
+## How to add Active Directory Authentication Library  ##
+You can install the **Active Directory Authentication Library** NuGet package from Visual Studio. When you install a NuGet package, Visual Studio creates a reference to the required assemblies.
 
+1.	Right click a solution.
+2.	Choose **Manage NuGet Packages**.
+3.	Search for **Active Directory Authentication Library**.
+4.	Choose **Active Directory Authentication Library** in the list of packages, and click **Install**.
