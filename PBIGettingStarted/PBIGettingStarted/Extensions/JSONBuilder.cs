@@ -1,4 +1,4 @@
-﻿// Copyright Microsoft 2014
+﻿// Copyright Microsoft 2015
 
 using System;
 using System.Collections.Generic;
@@ -190,6 +190,67 @@ namespace PowerBIExtensionMethods
 
             return jsonType;
 
+        }
+
+        public static string ToJsonSchema(this DataTable dataTable)
+        {
+            StringBuilder jsonSchemaBuilder = new StringBuilder();
+            string typeName = string.Empty;
+
+            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", dataTable.DataSet.DataSetName));
+            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", dataTable.TableName));
+            jsonSchemaBuilder.Append("\"columns\": [");
+
+            foreach (DataColumn dc in dataTable.Columns)
+            {
+                jsonSchemaBuilder.Append(string.Format("{0} \"name\": \"{1}\", \"dataType\": \"{2}\"{3},", "{", dc.ColumnName, dc.DataType.Name, "}"));
+            }
+
+            jsonSchemaBuilder.Remove(jsonSchemaBuilder.ToString().Length - 1, 1);
+            jsonSchemaBuilder.Append("]}]}");
+
+            return jsonSchemaBuilder.ToString();
+        }
+
+        public static string ToJson(this DataTable dataTable)
+        {
+            StringBuilder jsonBuilder = new StringBuilder();
+
+            jsonBuilder.Append(string.Format("{0}\"rows\":", "{"));
+            jsonBuilder.Append(JsonFromDataTable(dataTable));
+
+            jsonBuilder.Append(string.Format("{0}", "}"));
+
+            return jsonBuilder.ToString();
+        }
+
+        private static String JsonFromDataTable(DataTable dataTable)
+        {
+            var columnNames = dataTable.Columns;
+
+            int length = columnNames.Count;
+
+            String res = "[";
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                res += "{";
+
+                for (int i = 0; i < length; i++)
+                {
+                    res += "\"" + columnNames[i] + "\":\"" + row[columnNames[i]].ToString() + "\"";
+                    if (i < length - 1)
+                        res += ",";
+                }
+
+                res += "},";
+            }
+
+            res = res.Remove(res.Length - 1, 1);
+
+            res += "]";
+
+            return res;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿//Copyright Microsoft 2014
+﻿//Copyright Microsoft 2015
 
 using System;
 using System.Collections.Generic;
@@ -24,13 +24,15 @@ namespace PBIGettingStarted
 
     //See How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
 
+    //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
+
     class Program
     {
         //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
         private static string clientID = "";
 
-
-        //Replace redirectUri with the uri you used when you registered your app
+        
+        //RedirectUri you used when you registered your app.
         private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
         
         //Power BI resource uri
@@ -64,7 +66,6 @@ namespace PBIGettingStarted
             datasetsUri = TestConnection();
 
             CreateDataset();
-            //CreateFromSqlSchema();
 
             List<Object> datasets = GetAllDatasets();
 
@@ -81,7 +82,7 @@ namespace PBIGettingStarted
             //Optional to test clear rows from a table
             //ClearRows();
 
-            //Optional if using SQL Azure
+            //Optional if using SQL Server
             //AddSQLRows();
 
             // Finished pushing rows to Power BI, close the console window
@@ -199,8 +200,6 @@ namespace PBIGettingStarted
         {
             get
             {
-                
-
                 if (token == String.Empty)
                 {
                     TokenCache TC = new TokenCache();
@@ -282,8 +281,8 @@ namespace PBIGettingStarted
                 List<Product> products = new List<Product>
                 {
                     new Product{ProductID = 1, Name="Adjustable Race", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
-                    new Product{ProductID = 1, Name="LL Crankarm", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
-                    new Product{ProductID = 1, Name="HL Mountain Frame - Silver", Category="Bikes", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 2, Name="LL Crankarm", Category="Components", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
+                    new Product{ProductID = 3, Name="HL Mountain Frame - Silver", Category="Bikes", IsCompete = true, ManufacturedOn = new DateTime(2014, 7, 30)},
                 };
 
                 //POST request using the json from a list of Product
@@ -359,5 +358,79 @@ namespace PBIGettingStarted
 
             return request;
         }
+
+        static void SampleADONETDataset()
+        {
+            DataSet ds = new DataSet("Products");
+            ds.Tables.Add("Product");
+            ds.Tables[0].Columns.Add("ProductID", typeof(System.Int64));
+            ds.Tables[0].Columns.Add("Name", typeof(System.String));
+            ds.Tables[0].Columns.Add("Category", typeof(System.String));
+
+            object[] rowVals = new object[3];
+            DataRowCollection rowCollection = ds.Tables[0].Rows;
+            rowVals[0] = 1;
+            rowVals[1] = "Adjustable Race";
+            rowVals[2] = "Components";
+
+            // Add and return the new row.
+            DataRow row = rowCollection.Add(rowVals);
+
+            CreateFromDataset(ds);
+            AddDataTableRows(ds);
+
+        }
+
+        static void CreateFromDataset(DataSet ds)
+        {
+            //In a production application, use more specific exception handling.           
+            try
+            {
+                //Create a POST web request to list all datasets
+                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
+
+                var datasets = GetAllDatasets().Datasets(ds.DataSetName);
+
+                if (datasets.Count() == 0)
+                {
+                    //POST request using the json schema from Product
+                    //Sample hard coded to first table
+                    PostRequest(request, ds.Tables[0].ToJsonSchema());
+                }
+                else
+                {
+                    Console.WriteLine("Dataset exists");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        static void AddDataTableRows(DataSet ds)
+        {
+            //Get dataset id from a table name
+            string datasetId = GetAllDatasets().Datasets(ds.DataSetName).First()["id"].ToString();
+
+            //In a production application, use more specific exception handling. 
+            try
+            {
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, ds.Tables[0].TableName), "POST", AccessToken);
+
+                //POST request using the json from a list of Product
+                //NOTE: Posting rows to a model that is not created through the Power BI API is not currently supported. 
+                //      Please create a dataset by posting it through the API following the instructions on http://dev.powerbi.com.
+                //Sample hard coded to first table
+                PostRequest(request, ds.Tables[0].ToJson());
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+    
     }
 }
