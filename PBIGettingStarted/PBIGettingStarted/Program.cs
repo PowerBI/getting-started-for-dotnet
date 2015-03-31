@@ -31,7 +31,6 @@ namespace PBIGettingStarted
         //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
         private static string clientID = "";
 
-
         //RedirectUri you used when you registered your app.
         //For a client app, a redirect uri gives AAD more details on the specific application that it will authenticate.
         private static string redirectUri = "https://oauth.powerbi.com/PBIGettingStarted";
@@ -45,7 +44,6 @@ namespace PBIGettingStarted
 
         private static AuthenticationContext authContext = null;
         private static string token = String.Empty;
-
 
         //.NET Class Example:
         private static string datasetName = "SalesMarketing";
@@ -93,6 +91,30 @@ namespace PBIGettingStarted
         }
 
         /// <summary>
+        /// Use AuthenticationContext to get an access token
+        /// </summary>
+        /// <returns></returns>
+        static string AccessToken()
+        {          
+            if (token == String.Empty)
+            {
+                // Create an instance of TokenCache to cache the access token
+                TokenCache TC = new TokenCache();
+                // Create an instance of AuthenticationContext to acquire an Azure access token
+                authContext = new AuthenticationContext(authority, TC);
+                // Call AcquireToken to get an Azure token from Azure Active Directory token issuance endpoint
+                token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
+            }
+            else
+            {
+                // Get the token in the cache
+                token = authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
+            }
+
+            return token;
+        }
+
+        /// <summary>
         /// Create a Power BI schema from a SQL View.
         /// </summary>
         static void CreateFromSqlSchema()
@@ -110,7 +132,7 @@ namespace PBIGettingStarted
                 try
                 {
                     //Create a POST web request to list all datasets
-                    HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
+                    HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
 
                     var datasets = GetAllDatasets().Datasets(datasetName);
 
@@ -140,7 +162,7 @@ namespace PBIGettingStarted
             request.Method = "GET";
             request.ContentLength = 0;
             request.ContentType = "application/json";
-            request.Headers.Add("Authorization", String.Format("Bearer {0}", AccessToken));
+            request.Headers.Add("Authorization", String.Format("Bearer {0}", AccessToken()));
             request.AllowAutoRedirect = false;
 
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -183,7 +205,7 @@ namespace PBIGettingStarted
                     //In a production application, use more specific exception handling. 
                     try
                     {
-                        HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
+                        HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken());
                         //POST request using the json from a list of Product
                         Console.WriteLine(PostRequest(request, json));
 
@@ -197,25 +219,6 @@ namespace PBIGettingStarted
             }
         }
 
-        static string AccessToken
-        {
-            get
-            {
-                if (token == String.Empty)
-                {
-                    TokenCache TC = new TokenCache();
-                    authContext = new AuthenticationContext(authority,TC);
-                    token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken.ToString();
-                }
-                else
-                {
-                    token = authContext.AcquireTokenSilent(resourceUri, clientID).AccessToken;
-                }
-
-                return token;
-            }
-        }
-
         static List<Object> GetAllDatasets()
         {
             List<Object> datasets = null;
@@ -224,7 +227,7 @@ namespace PBIGettingStarted
             try
             {
                 //Create a GET web request to list all datasets
-                HttpWebRequest request = DatasetRequest(datasetsUri, "GET", AccessToken);
+                HttpWebRequest request = DatasetRequest(datasetsUri, "GET", AccessToken());
 
                 //Get HttpWebResponse from GET request
                 string responseContent = GetResponse(request);
@@ -247,7 +250,7 @@ namespace PBIGettingStarted
             try
             {               
                 //Create a POST web request to list all datasets
-                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
+                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
 
                 var datasets = GetAllDatasets().Datasets(datasetName);
 
@@ -276,7 +279,7 @@ namespace PBIGettingStarted
             //In a production application, use more specific exception handling. 
             try
             {
-                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken);
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken());
 
                 //Create a list of Product
                 List<Product> products = new List<Product>
@@ -308,7 +311,7 @@ namespace PBIGettingStarted
             try
             {
                 //Create a DELETE web request
-                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "DELETE", AccessToken);
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "DELETE", AccessToken());
                 request.ContentLength = 0;
 
                 Console.WriteLine(GetResponse(request));
@@ -348,14 +351,14 @@ namespace PBIGettingStarted
             return response;
         }
 
-        private static HttpWebRequest DatasetRequest(string datasetsUri, string method, string authorizationToken)
+        private static HttpWebRequest DatasetRequest(string datasetsUri, string method, string accessToken)
         {
             HttpWebRequest request = System.Net.WebRequest.Create(datasetsUri) as System.Net.HttpWebRequest;
             request.KeepAlive = true;
             request.Method = method;
             request.ContentLength = 0;
             request.ContentType = "application/json";
-            request.Headers.Add("Authorization", String.Format( "Bearer {0}", authorizationToken));
+            request.Headers.Add("Authorization", String.Format( "Bearer {0}", accessToken));
 
             return request;
         }
@@ -388,7 +391,7 @@ namespace PBIGettingStarted
             try
             {
                 //Create a POST web request to list all datasets
-                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken);
+                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
 
                 var datasets = GetAllDatasets().Datasets(ds.DataSetName);
 
@@ -418,7 +421,7 @@ namespace PBIGettingStarted
             //In a production application, use more specific exception handling. 
             try
             {
-                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, ds.Tables[0].TableName), "POST", AccessToken);
+                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, ds.Tables[0].TableName), "POST", AccessToken());
 
                 //POST request using the json from a list of Product
                 //NOTE: Posting rows to a model that is not created through the Power BI API is not currently supported. 
@@ -432,6 +435,5 @@ namespace PBIGettingStarted
                 Console.WriteLine(ex.Message);
             }
         }
-    
     }
 }
