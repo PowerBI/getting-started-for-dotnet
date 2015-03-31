@@ -31,13 +31,14 @@ namespace PBIGettingStarted
         //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
         private static string clientID = "";
 
-        
+
         //RedirectUri you used when you registered your app.
-        private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
+        //For a client app, a redirect uri gives AAD more details on the specific application that it will authenticate.
+        private static string redirectUri = "https://oauth.powerbi.com/PBIGettingStarted";
         
-        //Power BI resource uri
+        //Resource Uri for Power BI API
         private static string resourceUri = "https://analysis.windows.net/powerbi/api";             
-        //OAuth2 authority
+        //OAuth2 authority Uri
         private static string authority = "https://login.windows.net/common/oauth2/authorize";
         //Uri for Power BI datasets
         private static string datasetsUri = "https://api.powerbi.com/beta/myorg/datasets";
