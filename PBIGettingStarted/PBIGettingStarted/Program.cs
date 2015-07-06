@@ -33,7 +33,7 @@ namespace PBIGettingStarted
 
         //RedirectUri you used when you registered your app.
         //For a client app, a redirect uri gives AAD more details on the specific application that it will authenticate.
-        private static string redirectUri = "https://oauth.powerbi.com/PBIGettingStarted";
+        private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
         
         //Resource Uri for Power BI API
         private static string resourceUri = "https://analysis.windows.net/powerbi/api";             
