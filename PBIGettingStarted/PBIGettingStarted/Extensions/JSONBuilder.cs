@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using PBIGettingStarted;
 
 namespace PowerBIExtensionMethods
 {
@@ -140,21 +141,9 @@ namespace PowerBIExtensionMethods
             return jsonSchemaBuilder.ToString();
         }
 
-        public static T ToObject<T>(this string obj, int recursionDepth = 100)
+        public static IEnumerable<Dataset> GetDataset(this Dataset[] datasets, string name)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            serializer.RecursionLimit = recursionDepth;
-
-            string result = obj.Split(new Char[] { '[' })[1];
-            result = (result.EndsWith("}")) ? result = result.Substring(0, result.Length - 1) : result;
-            result = String.Format("[{0}", result);
-
-            return serializer.Deserialize<T>(result);
-        }
-
-        public static IEnumerable<Dictionary<string, object>> Datasets(this List<Object>datasets , string name)
-        {
-            IEnumerable<Dictionary<string, object>> q = from d in (from d in datasets select d as Dictionary<string, object>) where d["name"] as string == name select d;
+            var q = from d in datasets where d.Name == name select d;
 
             return q;
         }

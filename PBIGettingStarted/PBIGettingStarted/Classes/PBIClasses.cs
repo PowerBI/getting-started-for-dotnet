@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace PBIGettingStarted
 {
-    public class jsonExample
+    //Power BI Datasets
+    public class PBIDatasets
     {
+        public Dataset[] Datasets { get; set; }
+    }
+
+    public class Dataset
+    {
+        public string Id { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; }
     }
 
     public class Product
@@ -19,15 +25,5 @@ namespace PBIGettingStarted
         public string Category { get; set; }
         public bool IsCompete { get; set; }
         public DateTime ManufacturedOn { get; set; }
-    }
-
-
-    public class Music
-    {
-        public string Artist { get; set; }
-        public string Song { get; set; }
-        public string Genre { get; set; }
-        public string Location { get; set; }
-        public DateTime EventDate { get; set; }
     }
 }

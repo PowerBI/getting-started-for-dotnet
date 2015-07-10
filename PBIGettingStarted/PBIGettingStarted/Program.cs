@@ -13,6 +13,11 @@ using System.Web.Script.Serialization;
 using System.Data.SqlClient;
 using System.Data;
 
+//TODO: Be sure to run "Install-Package Microsoft.Net.Http" from your nuget command line.
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PBIGettingStarted
 {
@@ -29,16 +34,17 @@ namespace PBIGettingStarted
     class Program
     {
         //Step 1 - Replace clientID with your client app ID. To learn how to get a client app ID, see How to register an app (http://go.microsoft.com/fwlink/?LinkId=519361)
-        private static string clientID = "";
+        private static string clientID = "1c1e60d6-71c2-4765-8d95-6eb186c150c2";
 
         //RedirectUri you used when you registered your app.
         //For a client app, a redirect uri gives AAD more details on the specific application that it will authenticate.
-        private static string redirectUri = "https://login.live.com/oauth20_desktop.srf";
+        private static string redirectUri = "https://oauth.powerbi.com/PBIGettingStarted";
         
         //Resource Uri for Power BI API
         private static string resourceUri = "https://analysis.windows.net/powerbi/api";             
         //OAuth2 authority Uri
         private static string authority = "https://login.windows.net/common/oauth2/authorize";
+        
         //Uri for Power BI datasets
         private static string datasetsUri = "https://api.powerbi.com/beta/myorg/datasets";
 
@@ -49,16 +55,6 @@ namespace PBIGettingStarted
         private static string datasetName = "SalesMarketing";
         private static string tableName = "Product";
 
-        //SQL Server Examples
-        //private static string datasetName = "SQL_ProductList";
-        //private static string tableName = "jsonProduct";
-
-        //private static string datasetName = "SQL_vCompanySales";
-        //private static string tableName = "vCompanySales";
-
-        //private static string datasetName = "SQL_vWorkOrderRouting";
-        //private static string tableName = "vWorkOrderRouting";
-
         static void Main(string[] args)
         {
             // Test the connection and update the datasetsUri in case of redirect
@@ -66,23 +62,20 @@ namespace PBIGettingStarted
 
             CreateDataset();
 
-            List<Object> datasets = GetAllDatasets();
+            Dataset[] datasets = GetAllDatasets().Datasets;
 
-            foreach (Dictionary<string, object> obj in datasets)
+            foreach (Dataset dataset in datasets)
             {
-                Console.WriteLine(String.Format("id: {0} Name: {1}", obj["id"], obj["name"]));
+                Console.WriteLine(String.Format("id: {0} Name: {1}", dataset.Id, dataset.Name));
             }
 
             //Initiate pushing of rows to Power BI
             Console.WriteLine("Press the Enter key to push rows into Power BI:");
             Console.ReadLine();
-            AddClassRows();
+            AddRowsFromClass();
 
             //Optional to test clear rows from a table
             //ClearRows();
-
-            //Optional if using SQL Server
-            //AddSQLRows();
 
             // Finished pushing rows to Power BI, close the console window
             Console.WriteLine("Data pushed to Power BI. Press the Enter key to close this window:");
@@ -114,46 +107,6 @@ namespace PBIGettingStarted
             return token;
         }
 
-        /// <summary>
-        /// Create a Power BI schema from a SQL View.
-        /// </summary>
-        static void CreateFromSqlSchema()
-        {
-            SqlConnectionStringBuilder connStringBuilder = new SqlConnectionStringBuilder();
-            connStringBuilder.IntegratedSecurity = true;
-            connStringBuilder.DataSource = @".";
-            connStringBuilder.InitialCatalog = "AdventureWorks2012";
-
-            using (SqlConnection conn = new SqlConnection(connStringBuilder.ConnectionString))
-            {
-                conn.Open();
-          
-                //In a production application, use more specific exception handling.           
-                try
-                {
-                    //Create a POST web request to list all datasets
-                    HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
-
-                    var datasets = GetAllDatasets().Datasets(datasetName);
-
-                    if (datasets.Count() == 0)
-                    {
-                        //POST request using the json schema from Product
-                        Console.WriteLine(PostRequest(request, conn.ToJsonSchema(datasetName, tableName)));
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("Dataset exists");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                } 
-            }
-        }
-
         private static string TestConnection()
         {
             // Check the connection for redirects
@@ -174,54 +127,9 @@ namespace PBIGettingStarted
 
         }
 
-        static void AddSQLRows()
+        static PBIDatasets GetAllDatasets()
         {
-            //string sqlNamespace = "Sales";
-            //string sqlNamespace = "Production";
-
-            string sqlNamespace = "dbo";
-            SqlConnectionStringBuilder connStringBuilder = new SqlConnectionStringBuilder();
-            connStringBuilder.IntegratedSecurity = true;
-
-            //ConnectionBuilderActivity
-            connStringBuilder.DataSource = @".";
-            connStringBuilder.InitialCatalog = "AdventureWorks2012";
-
-            using (SqlConnection connection = new SqlConnection(connStringBuilder.ToString()))
-            {
-                //Next Iteration: Azure SQL DB - Reliable Connection
-                using (SqlCommand command = connection.CreateCommand())
-                {
-                    connection.Open();
-
-                    command.CommandText = String.Format("SELECT {0} FROM {1}.{2}", "*", sqlNamespace, tableName);
-                   
-                    //Next Iteration: Show ExecuteReaderAsync
-                    string json = command.ExecuteReader().ToJson();
-
-                    //Get dataset id from a table name
-                    string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
-
-                    //In a production application, use more specific exception handling. 
-                    try
-                    {
-                        HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, tableName), "POST", AccessToken());
-                        //POST request using the json from a list of Product
-                        Console.WriteLine(PostRequest(request, json));
-
-                        
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    } 
-                }
-            }
-        }
-
-        static List<Object> GetAllDatasets()
-        {
-            List<Object> datasets = null;
+            PBIDatasets PBIDatasets = null;
 
             //In a production application, use more specific exception handling.
             try
@@ -232,30 +140,30 @@ namespace PBIGettingStarted
                 //Get HttpWebResponse from GET request
                 string responseContent = GetResponse(request);
 
-                //Get list from response
-                datasets = responseContent.ToObject<List<Object>>();
+                //Deserialize JSON string from response
+                PBIDatasets = JsonConvert.DeserializeObject<PBIDatasets>(responseContent);
 
             }
             catch (Exception ex)
-            {               
+            {
                 //In a production application, handle exception
             }
 
-            return datasets;
+            return PBIDatasets;
         }
 
         static void CreateDataset()
         {
             //In a production application, use more specific exception handling.           
             try
-            {               
+            {
                 //Create a POST web request to list all datasets
                 HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
 
-                var datasets = GetAllDatasets().Datasets(datasetName);
+                var datasets = GetAllDatasets().Datasets.GetDataset(datasetName);
 
                 if (datasets.Count() == 0)
-                { 
+                {
                     //POST request using the json schema from Product
                     Console.WriteLine(PostRequest(request, new Product().ToJsonSchema(datasetName)));
                 }
@@ -264,17 +172,17 @@ namespace PBIGettingStarted
                     Console.WriteLine("Dataset exists");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 Console.WriteLine(ex.Message);
-            } 
+            }
         }
 
-        static void AddClassRows()
+        static void AddRowsFromClass()
         {
             //Get dataset id from a table name
-            string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
+            string datasetId = GetAllDatasets().Datasets.GetDataset(datasetName).First().Id;
 
             //In a production application, use more specific exception handling. 
             try
@@ -299,13 +207,13 @@ namespace PBIGettingStarted
             {
 
                 Console.WriteLine(ex.Message);
-            } 
+            }
         }
 
         static void ClearRows()
         {
             //Get dataset id from a table name
-            string datasetId = GetAllDatasets().Datasets(datasetName).First()["id"].ToString();
+            string datasetId = GetAllDatasets().Datasets.GetDataset(datasetName).First().Id;
 
             //In a production application, use more specific exception handling. 
             try
@@ -319,7 +227,7 @@ namespace PBIGettingStarted
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-            } 
+            }
         }
 
         private static string PostRequest(HttpWebRequest request, string json)
@@ -361,79 +269,6 @@ namespace PBIGettingStarted
             request.Headers.Add("Authorization", String.Format( "Bearer {0}", accessToken));
 
             return request;
-        }
-
-        static void SampleADONETDataset()
-        {
-            DataSet ds = new DataSet("Products");
-            ds.Tables.Add("Product");
-            ds.Tables[0].Columns.Add("ProductID", typeof(System.Int64));
-            ds.Tables[0].Columns.Add("Name", typeof(System.String));
-            ds.Tables[0].Columns.Add("Category", typeof(System.String));
-
-            object[] rowVals = new object[3];
-            DataRowCollection rowCollection = ds.Tables[0].Rows;
-            rowVals[0] = 1;
-            rowVals[1] = "Adjustable Race";
-            rowVals[2] = "Components";
-
-            // Add and return the new row.
-            DataRow row = rowCollection.Add(rowVals);
-
-            CreateFromDataset(ds);
-            AddDataTableRows(ds);
-
-        }
-
-        static void CreateFromDataset(DataSet ds)
-        {
-            //In a production application, use more specific exception handling.           
-            try
-            {
-                //Create a POST web request to list all datasets
-                HttpWebRequest request = DatasetRequest(datasetsUri, "POST", AccessToken());
-
-                var datasets = GetAllDatasets().Datasets(ds.DataSetName);
-
-                if (datasets.Count() == 0)
-                {
-                    //POST request using the json schema from Product
-                    //Sample hard coded to first table
-                    PostRequest(request, ds.Tables[0].ToJsonSchema());
-                }
-                else
-                {
-                    Console.WriteLine("Dataset exists");
-                }
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        static void AddDataTableRows(DataSet ds)
-        {
-            //Get dataset id from a table name
-            string datasetId = GetAllDatasets().Datasets(ds.DataSetName).First()["id"].ToString();
-
-            //In a production application, use more specific exception handling. 
-            try
-            {
-                HttpWebRequest request = DatasetRequest(String.Format("{0}/{1}/tables/{2}/rows", datasetsUri, datasetId, ds.Tables[0].TableName), "POST", AccessToken());
-
-                //POST request using the json from a list of Product
-                //NOTE: Posting rows to a model that is not created through the Power BI API is not currently supported. 
-                //      Please create a dataset by posting it through the API following the instructions on http://dev.powerbi.com.
-                //Sample hard coded to first table
-                PostRequest(request, ds.Tables[0].ToJson());
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
     }
 }
