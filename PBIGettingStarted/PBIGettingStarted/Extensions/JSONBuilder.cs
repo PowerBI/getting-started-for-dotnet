@@ -28,54 +28,25 @@ namespace PowerBIExtensionMethods
             return jsonBuilder.ToString();
         }
 
-        public static string ToJson(this IDataReader reader)
+        public static string ToDatasetJson(this object obj, string datasetName)
         {
-            StringBuilder jsonBuilder = new StringBuilder();
+            StringBuilder jsonSchemaBuilder = new StringBuilder();
+            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", datasetName));
 
-            jsonBuilder.Append(string.Format("{0}\"rows\":", "{"));
-            jsonBuilder.Append(JsonFromDataReader(reader));
+            jsonSchemaBuilder.Append(obj.ToTableSchema(obj.GetType().Name));
 
-            jsonBuilder.Append(string.Format("{0}", "}"));
+            jsonSchemaBuilder.Append("]}");
 
-            return jsonBuilder.ToString();
+            return jsonSchemaBuilder.ToString();
+
         }
 
-        public static String JsonFromDataReader(IDataReader reader)
-        {
-            var columnNames = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName).ToList();
-
-            int length = columnNames.Count;
-
-            String res = "[";
-
-            while (reader.Read())
-            {
-                res += "{";
-
-                for (int i = 0; i < length; i++)
-                {
-                    res += "\"" + columnNames[i] + "\":\"" + reader[columnNames[i]].ToString() + "\"";                   
-                    if (i < length - 1)
-                        res += ",";
-                }
-
-                res += "},";
-            }
-
-            res = res.Remove(res.Length - 1, 1);
-
-            res += "]";
-
-            return res;
-        }
-
-        public static string ToJsonSchema(this object obj, string name)
+        public static string ToTableSchema(this object obj, string tableName)
         {        
             StringBuilder jsonSchemaBuilder = new StringBuilder();
             string typeName = string.Empty;
 
-            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", name));
-            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", obj.GetType().Name));
+            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", tableName));
             jsonSchemaBuilder.Append("\"columns\": [");
 
             PropertyInfo[] properties = obj.GetType().GetProperties();
@@ -114,139 +85,25 @@ namespace PowerBIExtensionMethods
             }
 
             jsonSchemaBuilder.Remove(jsonSchemaBuilder.ToString().Length - 1, 1);
-            jsonSchemaBuilder.Append("]}]}");
+
+            jsonSchemaBuilder.Append("]}");
 
             return jsonSchemaBuilder.ToString();
         }
 
-        public static string ToJsonSchema(this SqlConnection sqlConnection, string name, string viewName)
+        public static dataset GetDataset(this dataset[] datasets, string datasetName)
         {
-            StringBuilder jsonSchemaBuilder = new StringBuilder();
+            var q = (from d in datasets where d.Name == datasetName select d).FirstOrDefault();
 
-            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", name));
-            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", viewName));
-            jsonSchemaBuilder.Append("\"columns\": [");
-
-            string json = String.Concat(from r in sqlConnection.GetSchema("Columns").AsEnumerable()
-                           where r.Field<string>("TABLE_NAME") == viewName
-                          orderby r.Field<int>("ORDINAL_POSITION")
-                                  select 
-                                  string.Format("{0} \"name\":\"{1}\", \"dataType\": \"{2}\"{3}, ", "{", r.Field<string>("COLUMN_NAME"), ConvertSqlType(r.Field<string>("DATA_TYPE")), "}")
-                           );
-
-            jsonSchemaBuilder.Append(json);
-            jsonSchemaBuilder.Remove(jsonSchemaBuilder.ToString().Length - 2, 2);
-            jsonSchemaBuilder.Append("]}]}");
-
-            return jsonSchemaBuilder.ToString();
+            return q;       
         }
 
-        public static IEnumerable<Dataset> GetDataset(this Dataset[] datasets, string name)
+        public static group GetGroup(this group[] groups, string groupName)
         {
-            var q = from d in datasets where d.Name == name select d;
+            var q = (from d in groups where d.Name == groupName select d).FirstOrDefault();
 
-            return q;
+            return q;       
         }
-
-        private static string ConvertSqlType(string sqlType)
-        {
-            string jsonType = string.Empty;
-
-            switch (sqlType)
-            {
-                case "int":
-                case "smallint":
-                case "bigint":
-                    jsonType = "Int64";
-                    break;
-                case "decimal":
-                case "money":
-                    jsonType = "Double";
-                    break;
-                case "bit":
-                    jsonType = "bool";
-                    break;
-                case "datetime":
-                    jsonType = "DateTime";
-                    break;
-                case "nvarchar":
-                    jsonType = "string";
-                    break;
-                default:
-                    jsonType = null;
-                    break;
-            }
-
-            return jsonType;
-
-        }
-
-        public static string ToJsonSchema(this DataTable dataTable)
-        {
-            StringBuilder jsonSchemaBuilder = new StringBuilder();
-            string typeName = string.Empty;
-
-            jsonSchemaBuilder.Append(string.Format("{0}\"name\": \"{1}\",\"tables\": [", "{", dataTable.DataSet.DataSetName));
-            jsonSchemaBuilder.Append(String.Format("{0}\"name\": \"{1}\", ", "{", dataTable.TableName));
-            jsonSchemaBuilder.Append("\"columns\": [");
-
-            foreach (DataColumn dc in dataTable.Columns)
-            {
-                jsonSchemaBuilder.Append(string.Format("{0} \"name\": \"{1}\", \"dataType\": \"{2}\"{3},", "{", dc.ColumnName, dc.DataType.Name, "}"));
-            }
-
-            jsonSchemaBuilder.Remove(jsonSchemaBuilder.ToString().Length - 1, 1);
-            jsonSchemaBuilder.Append("]}]}");
-
-            return jsonSchemaBuilder.ToString();
-        }
-
-        public static string ToJson(this DataTable dataTable)
-        {
-            StringBuilder jsonBuilder = new StringBuilder();
-
-            jsonBuilder.Append(string.Format("{0}\"rows\":", "{"));
-            jsonBuilder.Append(JsonFromDataTable(dataTable));
-
-            jsonBuilder.Append(string.Format("{0}", "}"));
-
-            return jsonBuilder.ToString();
-        }
-
-        private static String JsonFromDataTable(DataTable dataTable)
-        {
-            var columnNames = dataTable.Columns;
-
-            int length = columnNames.Count;
-
-            String res = "[";
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                res += "{";
-
-                for (int i = 0; i < length; i++)
-                {
-                    res += "\"" + columnNames[i] + "\":\"" + row[columnNames[i]].ToString() + "\"";
-                    if (i < length - 1)
-                        res += ",";
-                }
-
-                res += "},";
-            }
-
-            res = res.Remove(res.Length - 1, 1);
-
-            res += "]";
-
-            return res;
-        }
-    }
-
-    public class JsonColumn
-    {
-        public string Name { get; set; }
-        public string DataType { get; set; }
     }
 
     public class JavaScriptConverter<T> : JavaScriptConverter where T : new()

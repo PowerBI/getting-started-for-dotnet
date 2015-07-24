@@ -6,17 +6,38 @@ using System.Threading.Tasks;
 
 namespace PBIGettingStarted
 {
-    //Power BI Datasets
-    public class PBIDatasets
+    public class Datasets
     {
-        public Dataset[] Datasets { get; set; }
+        public dataset[] value { get; set; }
     }
 
-    public class Dataset
+    public class dataset
     {
         public string Id { get; set; }
         public string Name { get; set; }
     }
+
+    public class Tables
+    {
+        public table[] value { get; set; }
+    }
+
+    public class table
+    {
+        public string Name { get; set; }
+    }
+
+    public class Groups
+    {
+        public group[] value { get; set; }
+    }
+
+    public class group
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
 
     public class Product
     {
@@ -25,5 +46,17 @@ namespace PBIGettingStarted
         public string Category { get; set; }
         public bool IsCompete { get; set; }
         public DateTime ManufacturedOn { get; set; }
+    }
+
+    //Example of a new Product schema
+    public class Product2
+    {
+        public int ProductID { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public bool IsCompete { get; set; }
+        public DateTime ManufacturedOn { get; set; }
+
+        public string NewColumn { get; set; }
     }
 }
