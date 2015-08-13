@@ -549,7 +549,7 @@ namespace PBIGettingStarted
                 // Create an instance of AuthenticationContext to acquire an Azure access token
                 authContext = new AuthenticationContext(authority, TC);
                 // Call AcquireToken to get an Azure token from Azure Active Directory token issuance endpoint
-                token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri), PromptBehavior.RefreshSession).AccessToken.ToString();
+                token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri), PromptBehavior.RefreshSession).AccessToken;
             }
             else
             {
