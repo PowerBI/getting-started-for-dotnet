@@ -1,1 +1,1 @@
-we moved this sample to [https://github.com/Microsoft/PowerBI-CSharp/tree/master/samples/consoleapp/getting-started-for-dotnet](https://github.com/Microsoft/PowerBI-CSharp/tree/master/samples/consoleapp/getting-started-for-dotnet)
+We moved this sample to [https://github.com/Microsoft/PowerBI-CSharp/tree/master/samples/consoleapp/getting-started-for-dotnet](https://github.com/Microsoft/PowerBI-CSharp/tree/master/samples/consoleapp/getting-started-for-dotnet)
